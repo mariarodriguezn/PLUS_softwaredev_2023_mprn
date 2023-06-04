@@ -12,3 +12,8 @@ Modified the environment "software_dev_v1.yml" using Anaconda Prompt by:
 * Exporting the modified environment: `conda env export -n software_dev_v1>software_dev_v1_mod.yml`
 
 For the environment "software_dev_v2.yml", it could not be recreated even if it is OS generic. Possibly, as it does not specify the versions of the packages or dependencies, it can lead to an unsolvable environment. The OS may not be able to resolve the environment because it cannot determine the appropriate versions of the packages to install.
+
+## Assignment 3:
+Created a Jupyter Notebook with the basic steps of working with Satellite Images in Python, specifically leveraging numpy, matplotlib, and rasterio. 
+* Used dataset: Landsat 8 OLI/TIRS C2 L2 image which covers Buenaventura, a coastal seaport city situated in Colombia
+
