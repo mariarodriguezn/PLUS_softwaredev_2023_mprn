@@ -16,4 +16,5 @@ For the environment "software_dev_v2.yml", it could not be recreated even if it 
 ## Assignment 3:
 Created a Jupyter Notebook with the basic steps of working with Satellite Images in Python, specifically leveraging numpy, matplotlib, and rasterio. 
 * Used dataset: Landsat 8 OLI/TIRS C2 L2 image which covers Buenaventura, a coastal seaport city situated in Colombia
+* Based on: series of blog tutorials titled [Python for Geosciences: Working with Satellite Images (step by step)](https://medium.com/@cordmaur/list/python-for-remote-sensing-25d32ab8f21d) created by Maurício Cordeiro
 
