@@ -1,12 +1,22 @@
 """
 Interact with the NASA AppEEARS API to obtain and process ECOSTRESS satellite data.
 
-Module functions:
-- get_token(username): Get authentication token from NASA Earthdata Login API.
-- submit_task(token, request_name, start_date, end_date, aoi): Submit a task to the NASA AppEEARS API.
-- list_tasks(token): List all the tasks associated with a user account.
-- download_data_bundles(token, list_task_id): Download data bundles for the given task IDs.
-- apply_cloud_masking(list_folder_name): Apply cloud masking to the specified folders of images.
+Functions
+----------
+get_token(username): 
+    Get authentication token from NASA Earthdata Login API.
+
+submit_task(token, request_name, start_date, end_date, aoi): 
+    Submit a task to the NASA AppEEARS API.
+
+list_tasks(token): 
+    List all the tasks associated with a user account.
+
+download_data_bundles(token, list_task_id): 
+    Download data bundles for the given task IDs.
+
+apply_cloud_masking(list_folder_name): 
+    Apply cloud masking to the specified folders of raw images.
 """
 
 import requests
@@ -326,6 +336,10 @@ def apply_cloud_masking(list_folder_name):
         cloud mask files. Each folder corresponds to a specific set of images
         to be processed.
 
+    Returns
+    -------
+    None
+
     Examples
     --------
     >>> folders = ['Folder1_Raw', 'Folder2_Raw']
@@ -354,27 +368,29 @@ def apply_cloud_masking(list_folder_name):
         LST_filenames = LST_filenames[["datetime_UTC", "LST_raw_filename", "cloud_filename", "LST_masked_filename"]]
         print(LST_filenames["LST_raw_filename"][0])
 
-    # Cloud Mask Application
-    for i, (datetime_UTC, LST_raw_filename, cloud_filename, LST_masked_filename) in LST_filenames.iterrows():
-        # Open LST raw image file
-        LST = rioxarray.open_rasterio(LST_raw_filename).squeeze("band", drop=True)
-        # Convert values of raw image file to Temperature → Apply Scale factor to DN and then convert from K to °C
-        LST.data = np.where(LST.data == 0, np.nan, LST.data * 0.02) - 273.15
-        # Open associated cloud file and make sure it is on the same spatial grid as the LST raw image file
-        cloud = rioxarray.open_rasterio(cloud_filename).squeeze("band", drop=True).rio.reproject_match(LST)
-        # Bit masking to convert to a cloud mask
-        cloud.data = (cloud.data >> 2) & 1
-        # Apply cloud mask
-        LST.data = np.where(cloud.data, np.nan, LST.data)
+        # Cloud Mask Application
+        for i, (datetime_UTC, LST_raw_filename, cloud_filename, LST_masked_filename) in LST_filenames.iterrows():
+            # Open LST raw image file
+            LST = rioxarray.open_rasterio(LST_raw_filename).squeeze("band", drop=True)
+            # Convert values of raw image file to Temperature → Apply Scale factor to DN and then convert from K to °C
+            LST.data = np.where(LST.data == 0, np.nan, LST.data * 0.02) - 273.15
+            # Open associated cloud file and make sure it is on the same spatial grid as the LST raw image file
+            cloud = rioxarray.open_rasterio(cloud_filename).squeeze("band", drop=True).rio.reproject_match(LST)
+            # Bit masking to convert to a cloud mask
+            cloud.data = (cloud.data >> 2) & 1
+            # Apply cloud mask
+            LST.data = np.where(cloud.data, np.nan, LST.data)
 
-        # Remove possible outliers
-        low, high = np.nanquantile(LST.data, [0.01, 0.99])
-        LST.data = np.where((LST.data < low) | (LST.data > high), np.nan, LST.data)
+            # Remove possible outliers
+            low, high = np.nanquantile(LST.data, [0.01, 0.99])
+            LST.data = np.where((LST.data < low) | (LST.data > high), np.nan, LST.data)
 
-        # Quantify missing pixels in the image
-        #missing_proportion = np.count_nonzero(np.isnan(LST.data)) / LST.data.size
-        #if missing_proportion > 0.5:
-         #   continue
+            # Quantify missing pixels in the image
+            #missing_proportion = np.count_nonzero(np.isnan(LST.data)) / LST.data.size
+            #if missing_proportion > 0.5:
+            #   continue
 
-        # Write image as a new .tif
-        LST.rio.to_raster(LST_masked_filename)
+            # Write image as a new .tif
+            LST.rio.to_raster(LST_masked_filename)
+        
+        print('Masking for folder {0} has been completed.'.format(folder_name))
