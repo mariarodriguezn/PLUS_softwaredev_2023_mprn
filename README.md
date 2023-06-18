@@ -18,3 +18,5 @@ Created a Jupyter Notebook with the basic steps of working with Satellite Images
 * Used dataset: Landsat 8 OLI/TIRS C2 L2 image which covers Buenaventura, a coastal seaport city situated in Colombia
 * Based on: series of blog tutorials titled [Python for Geosciences: Working with Satellite Images (step by step)](https://medium.com/@cordmaur/list/python-for-remote-sensing-25d32ab8f21d) created by Maurício Cordeiro
 
+## Assignment 4:
+ECOSTRESS python module is meant to help the users to interact with the NASA AppEEARS API to download and cloud mask ECOSTRESS Land Surface Temperature (LST) satellite data
